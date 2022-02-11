@@ -8,7 +8,7 @@
 
 ## Requirements
 
-* Ruby 2.7
+* Ruby 2.7.2
 * Bundler 2
 
 ## Setup
