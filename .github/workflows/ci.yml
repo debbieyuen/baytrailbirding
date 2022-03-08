@@ -13,6 +13,11 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7.2
+        
+    - name: Install NodeJS (16)
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
 
     - name: Set up Code Climate test-reporter
       run: |
@@ -28,6 +33,10 @@ jobs:
       run: |
         bundle install
     
+    - name: Install node_modules
+      run: |
+        npm install
+    
     - name: Set up database
       run: |
         bundle exec rake db:create db:migrate
@@ -41,6 +50,10 @@ jobs:
       run: |
         bundle exec cucumber --retry 2
         ./cc-test-reporter format-coverage --output coverage/codeclimate.$SUITE.json --input-type simplecov
+        
+    - name: run ESLinting
+      run: |
+        npm run lint
         
     - name: Publish code coverage
       run: |
