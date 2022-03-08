@@ -37,3 +37,6 @@
 
 # Ignore Gem Installation Files
 /vendor/
+
+# Ignore node_modules
+node_modules/
