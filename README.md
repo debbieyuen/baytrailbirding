@@ -42,3 +42,10 @@ To run the Cucumber and RSpec tests:
 $ bundle exec cucumber
 $ bundle exec rspec
 ```
+
+To run ESLint:
+```bash
+$ npm install
+$ npm run lint
+$ npm run lint:fix
+```
