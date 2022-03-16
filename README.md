@@ -13,6 +13,7 @@
 
 * Ruby 2.7
 * Bundler 2
+* NodeJS v16.x
 
 ## Setup
 
