@@ -5,7 +5,6 @@ env:
 extends: 'eslint:recommended'
 parserOptions:
   ecmaVersion: 11
-  sourceType: module
 rules:
   indent:
     - error
@@ -75,12 +74,12 @@ rules:
       - '!!'
   no-implicit-globals: warn
   no-implied-eval: error
-  no-invalid-this: error
+  no-invalid-this: warn
   no-iterator: error
   no-labels: error
   no-lone-blocks: error
   no-loop-func: error
-  no-magic-numbers: warn
+  no-magic-numbers: off
   no-multi-spaces: error
   no-multi-str: warn
   no-new: error
@@ -121,7 +120,9 @@ rules:
     - consistent
   block-spacing: error
   brace-style: error
-  camelcase: error
+  camelcase:
+    - error
+    - properties: never
   capitalized-comments:
     - error
     - always
@@ -174,7 +175,9 @@ rules:
   max-depth: error
   max-len:
     - error
-    - code: 100
+    - code: 120
+      ignoreUrls: true
+      ignoreTemplateLiterals: true
   max-nested-callbacks: error
   max-params:
     - error
@@ -188,7 +191,9 @@ rules:
   multiline-ternary:
     - error
     - always-multiline
-  new-cap: error
+  new-cap:
+    - error
+    - properties: false
   new-parens:
     - error
     - always
@@ -283,3 +288,4 @@ rules:
     - never
   yield-star-spacing: error
   no-undef: warn
+  no-var: error
