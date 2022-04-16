@@ -140,27 +140,45 @@ class BirdMap {
 		marker.birdId = bird.subId;
 
 		marker.on('click', () => {
-			$('.overlay')
-				.html(`
-					<div class="expand-icon"></div>
-					<div class="content">
-						<div class="bird-name">${bird.name.com}</div>
-						<div class="science-name">${bird.name.sci}</div>
-						<div class="bird-img-wrapper">
-							<img class="bird-img" src="/duck.png">
-						</div>
-						<div class="location-wrapper">
-							<div class="location">Loc</div>
-							<div class="separator"><i class="fa-solid fa-circle"></i></div>
-							<div class="distance">${Unit.m2mi(marker.getLatLng().distanceTo(this.position)).toFixed(2)} mi</div>
-						</div>
-						<div class="description-wrapper">
-							<div class="description-header">Description:</div>
-							<div class="description-content">No Description Available</div>
-					</div>
-					</div>
-				`)
+			const request = {
+			url: '/ebird/bird',
+			method: 'GET',
+			timeout: 0,
+			data: {
+				sci: bird.name.sci,
+				com: bird.name.com
+				}
+			};
+			
+			return new Promise(resolve => {
+				$.ajax(request).done(img => {
+						$('.overlay')
+						.html(`
+							<div class="expand-icon"></div>
+							<div class="content">
+								<div class="bird-name">${bird.name.com}</div>
+								<div class="science-name">${bird.name.sci}</div>
+								<div class="bird-img-wrapper">
+									<img class="bird-img" src=${img.img} width=50% height=50%>
+								</div>
+								<div class="location-wrapper">
+									<div class="location">Loc</div>
+									<div class="separator"><i class="fa-solid fa-circle"></i></div>
+									<div class="distance">${Unit.m2mi(marker.getLatLng().distanceTo(this.position)).toFixed(2)} mi</div>
+								</div>
+								<div class="description-wrapper">
+									<div class="description-header">Description:</div>
+									<div class="description-content">
+										Clark's grebe is a North American waterbird species in the grebe family. Until the 1980s, it was thought to be a pale morph of the western grebe, which it resembles in size, range, and behavior. Intermediates between the two species are known.
+									</div>
+							</div>
+							</div>
+						`)
 				.removeAttr('hidden');
+				});
+			});
+
+			
 		});
 
 		return marker;

@@ -170,6 +170,7 @@ module EbirdHelper
   def getImageFromName(name)
 
     #check cache for bird name
+    #Cache should store sciname, comm name, and wikipedia result 
     wikimedia_params = {
       :action => "query",
       :prop => "pageimages",
@@ -192,6 +193,7 @@ module EbirdHelper
     image_src = first_page["original"]["source"]
 
     #put bird name and image into cache
+    
     return image_src
 
   end

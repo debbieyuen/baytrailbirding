@@ -29,7 +29,7 @@ RSpec.describe EbirdHelper, type: :helper do
           "comName" => "Canada Goose",
           "sciName" => "Branta canadensis"
         }
-        image = getImageSrc(data);
+        image = getImageSrc("Canada Goose","Branta canadensis");
         expect(image).to eq "https://upload.wikimedia.org/wikipedia/commons/4/40/Canada_goose_on_Seedskadee_NWR_%2827826185489%29.jpg"
       end
     end
@@ -39,7 +39,7 @@ RSpec.describe EbirdHelper, type: :helper do
           "comName" => "Sora",
           "sciName" => "porzana carolina"
         }
-        image = getImageSrc(data);
+        image = getImageSrc("Sora", "porzana carolina");
         expect(image).to eq "https://upload.wikimedia.org/wikipedia/commons/2/2d/Sora_%28Porzana_carolina%29.jpg"
       end
     end
@@ -49,7 +49,7 @@ RSpec.describe EbirdHelper, type: :helper do
           "comName" => "Common x Barrow's Goldeneye (hybrid)",
           "sciName" => "Bucephala clangula x islandica"
         }
-        image = getImageSrc(data);
+        image = getImageSrc("Common x Barrow's Goldeneye (hybrid)", "Bucephala clangula x islandica");
         expect(image).to eq nil
       end
     end
