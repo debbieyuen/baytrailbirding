@@ -17,7 +17,6 @@ class Ebird {
 		const request = {
 			url: '/ebird/birds',
 			method: 'GET',
-			timeout: 0,
 			data: {
 				lat,
 				lng,
@@ -35,6 +34,28 @@ class Ebird {
 			});
 		});
 	}
+
+	static getHotspots(lat, lng, radius) {
+		const request = {
+			url: '/ebird/hotspots',
+			method: 'GET',
+			data: {
+				lat,
+				lng,
+				radius
+			}
+		};
+
+		return new Promise(resolve => {
+			$.ajax(request).done(hotspots => {
+				hotspots.forEach(hotspot => {
+					hotspot.obs.date = new Date(hotspot.obs.date);
+					hotspot.loc.latLng = L.latLng(hotspot.loc.lat, hotspot.loc.lng);
+				});
+				resolve(hotspots);
+			});
+		});
+	}
 }
 
 class BirdMap {
@@ -46,7 +67,6 @@ class BirdMap {
 
 		L.tileLayer(tileLayerSource, {
 			maxZoom: 22,
-			// subdomains: 'abcd',
 			accessToken: 'pk.eyJ1IjoibG9obmVzd3JpZ2h0IiwiYSI6IngzbVlqNnMifQ.OwxjrBKoGXc60NB5x6GKzw',
 			attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		}).addTo(map);
@@ -62,6 +82,30 @@ class BirdMap {
 				}),
 				marker: L.divIcon({
 					html: '<i class="fa-solid fa-dove fa-2x"></i>',
+					iconSize: [20, 20],
+					className: 'bird-icon'
+				})
+			},
+			hotspot: {
+				selected: L.divIcon({
+					html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
+					iconSize: [20, 20],
+					className: 'hotspot-icon-selected'
+				}),
+				marker: L.divIcon({
+					html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
+					iconSize: [20, 20],
+					className: 'hotspot-icon'
+				})
+			},
+			location: {
+				selected: L.divIcon({
+					html: 'TODO',
+					iconSize: [20, 20],
+					className: 'bird-icon-selected'
+				}),
+				marker: L.divIcon({
+					html: 'TODO',
 					iconSize: [20, 20],
 					className: 'bird-icon'
 				})
@@ -81,20 +125,28 @@ class BirdMap {
 		this.map.once('moveend', () => {
 			this.map.setMinZoom(this.map.getZoom());
 
-			this.markers = L.markerClusterGroup();
+			this.birds = L.markerClusterGroup();
+			this.hotspots = L.markerClusterGroup();
+			this.locations = L.markerClusterGroup();
+
+			this.markers = L.layerGroup([this.birds, this.hotspots, this.locations]);
 
 			this.markers.on('clusterclick', () => {
-				if (this.selected) this.selected.setIcon(this.icon.bird.marker);
+				if (this.selected) this.selected.setIcon(this.selected.defaultIcon);
 				$('.overlay').attr('hidden', '');
 			});
 
 			this.selected = null;
 
-			this.map.on('moveend', () => this.loadBirds());
+			this.map.on('moveend', () => {
+				this.load();
+			});
 
-			this.map.addLayer(this.markers);
+			this.map.addLayer(this.birds);
+			this.map.addLayer(this.hotspots);
+			this.map.addLayer(this.locations);
 
-			this.loadBirds();
+			this.load();
 		});
 
 		this.map.fitBounds(bounds);
@@ -111,22 +163,53 @@ class BirdMap {
 			.map(bird => this.createBird(bird.loc.latLng, bird));
 
 		markers.forEach(marker => {
-			const alreadyExists = this.markers.getLayers().find(mapMarker => mapMarker.birdId === marker.birdId);
-			if (!alreadyExists) this.markers.addLayer(marker);
+			const isNearHotspot = this.hotspots.getLayers().find(hotspotMarker => hotspotMarker.getLatLng().equals(marker.getLatLng()));
+			const alreadyExists = this.birds.getLayers().find(mapMarker => mapMarker.birdId === marker.birdId);
+			if (!alreadyExists && !isNearHotspot) this.birds.addLayer(marker);
 		});
 	}
 
-	createMarker(latLng, icon) {
+	async loadHotspots() {
+		const {
+			lat, lng
+		} = this.getCurrPosition();
+		const hotspots = await Ebird.getHotspots(lat, lng, this.getRadius());
+		const bounds = this.map.getBounds();
+		const markers = hotspots
+			.filter(hotspot => bounds.contains(hotspot.loc.latLng))
+			.map(hotspot => this.createHotspot(hotspot.loc.latLng, hotspot));
+
+		markers.forEach(marker => {
+			const alreadyExists = this.hotspots.getLayers().find(mapMarker => mapMarker.locId === marker.locId);
+			if (!alreadyExists) this.hotspots.addLayer(marker);
+		});
+	}
+
+	async loadLocations() {
+		// Right now does not load anything
+	}
+
+	async load() {
+		await this.loadHotspots();
+
+		await this.loadLocations();
+
+		await this.loadBirds();
+	}
+
+	createMarker(latLng, icon, selectIcon) {
 		const marker = L.marker(latLng, {
 			icon,
 			riseOnHover: true
 		});
 
+		marker.defaultIcon = icon;
+
 		marker.on('click', () => {
 			const position = marker.getLatLng();
-			if (this.selected) this.selected.setIcon(this.icon.bird.marker);
+			if (this.selected) this.selected.setIcon(icon);
 			this.selected = marker;
-			this.selected.setIcon(this.icon.bird.selected);
+			this.selected.setIcon(selectIcon);
 			this.setCurrPosition(position);
 		});
 
@@ -134,8 +217,7 @@ class BirdMap {
 	}
 
 	createBird(latLng, bird) {
-
-		const marker = this.createMarker(latLng, this.icon.bird.marker);
+		const marker = this.createMarker(latLng, this.icon.bird.marker, this.icon.bird.selected);
 
 		marker.birdId = bird.subId;
 
@@ -164,6 +246,22 @@ class BirdMap {
 		});
 
 		return marker;
+	}
+
+	createHotspot(latLng, hotspot) {
+		const marker = this.createMarker(latLng, this.icon.hotspot.marker, this.icon.hotspot.selected);
+
+		marker.locId = hotspot.loc.id;
+
+		marker.on('click', () => {
+			console.log(hotspot);
+		});
+
+		return marker;
+	}
+
+	createLocation(latLng, location) {
+		// TODO
 	}
 
 	setCurrPosition(latLng) {
