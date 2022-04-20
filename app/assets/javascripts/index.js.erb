@@ -3,8 +3,11 @@
 
 'use strict';
 
-const MAX_RADIUS = 50;	// Radius distance in miles
+const MAX_RADIUS = 50;	// Radius distance in KM
 
+/**
+ * Unit conversions
+ */
 const Unit = {
 	mi2km: mi => mi * 1.609,
 	mi2m: mi => Unit.mi2km(mi) * 1000,
@@ -12,7 +15,16 @@ const Unit = {
 	m2mi: m => Unit.km2mi(m / 1000)
 };
 
+/**
+ * AJAX Wrapper Class
+ */
 class API {
+	/**
+	 * Sends a GET request to url with data
+	 * @param {string} url
+	 * @param {Object} data
+	 * @returns {Promise<Object>} response data
+	 */
 	static get(url, data) {
 		const request = {
 			method: 'GET',
@@ -26,32 +38,129 @@ class API {
 	}
 }
 
+/**
+ * Wrapper class to help distinguish locations
+ */
+class Location {
+	/**
+	 * Formatted location data
+	 * @param {Object} location - Raw location data
+	 */
+	constructor(location) {
+		Object.assign(this, JSON.parse(JSON.stringify(location)));
+
+		// TODO
+	}
+
+	/**
+	 * Converts raw location data into a formatted one
+	 * @param {Object} location - Raw location data
+	 * @returns {Location} Formatted location data
+	 */
+	static from(location) {
+		return new Location(location);
+	}
+}
+
+/**
+ * Wrapper class to help distinguish hotspots
+ * @property {Object} loc			- Location object
+ * @property {string} loc.id		- Location ID
+ * @property {string} loc.name		- Location Name
+ * @property {number} loc.lat		- Location latitude
+ * @property {number} loc.lng		- Location longitude
+ * @property {L.LatLng} loc.latLng	- Location Leaflet position
+ * @property {Object} code			- Code object
+ * @property {string} code.country	- Country code
+ * @property {string} code.subnat1	- Sub National Level 1 code
+ * @property {string} code.subnat2	- Sub National Level 2 code
+ * @property {Object} obs			- Observation object
+ * @property {Date} obs.date		- Observation date
+ * @property {number} cnt			- Number of birds at this hotspot
+ */
 class Hotspot {
+	/**
+	 * Formatted hotspot data
+	 * @param {Object} hotspot - Raw hotspot data
+	 */
 	constructor(hotspot) {
 		Object.assign(this, JSON.parse(JSON.stringify(hotspot)));
 		this.obs.date = new Date(this.obs.date);
 		this.loc.latLng = L.latLng(this.loc.lat, this.loc.lng);
 	}
 
+	/**
+	 * Converts raw hotspot data into a formatted one
+	 * @param {Object} hotspot - Raw hotspot data
+	 * @returns {Hotspot} Formatted hotspot data
+	 */
 	static from(hotspot) {
 		return new Hotspot(hotspot);
 	}
 }
 
+/**
+ * Wrapper class to help distinguish birds
+ * @property {string} speciesCode	- Code of the species; can contain multiple subspecies
+ * @property {string} subId			- ID of the bird observation; use this as the ID
+ * @property {Object} name			- Name object of the bird
+ * @property {string} name.sci		- Scientific name
+ * @property {string} name.com		- Common name
+ * @property {Object} loc			- Location object
+ * @property {string} loc.id		- Location ID
+ * @property {string} loc.name		- Location Name
+ * @property {number} loc.lat		- Location latitude
+ * @property {number} loc.lng		- Location longitude
+ * @property {L.LatLng} loc.latLng	- Location Leaflet position
+ * @property {boolean} loc.private	- Whether or not the location is private
+ * @property {number} loc.dist		- Location distance from queried lat, long
+ * @property {Object} obs			- Observation object
+ * @property {Date} obs.date		- Observation date
+ * @property {number} obs.cnt		- Observation count
+ * @property {boolean} obs.valid	- Whether or not the observation is valid
+ * @property {boolean} obs.reviewed	- Whether or not the observation has been reviewed
+ * @property {null} img				- NOT CURRENTLY USED
+ */
 class Bird {
+	/**
+	 * Formatted bird data
+	 * @param {Object} bird - Raw bird data
+	 */
 	constructor(bird) {
 		Object.assign(this, JSON.parse(JSON.stringify(bird)));
 		this.obs.date = new Date(this.obs.date);
 		this.loc.latLng = L.latLng(this.loc.lat, this.loc.lng);
 	}
 
+	/**
+	 * Converts raw bird data into a formatted one
+	 * @param {Object} bird - Raw bird data
+	 * @returns {Bird} Formatted bird data
+	 */
 	static from(bird) {
 		return new Bird(bird);
 	}
 }
 
+/**
+ * Class to access our API
+ */
 class Ebird {
-	static async getBirds(lat, lng, radius, hotspot = undefined) {
+	/**
+	 * Returns a list of birds from the ebird API through our API
+	 * @example
+	 * // Gets a list of birds WITHOUT hotspot
+	 * await getBirds(37.8039, -122.2591, 15);
+	 * @example
+	 * // Gets a list of birds WITH hotspot
+	 * await getBirds(0, 0, 0, 'L6530472');
+	 * @param {number} lat - Latitude
+	 * @param {number} lng - Longitude
+	 * @param {number} radius - Radius/Distance from lat, lng in KM
+	 * @param {hotspot} [hotspot] - OPTIONAL, ID of the hotspot
+	 * @returns {Promise<Bird[]>} A promise to a list of formatted birds
+	 */
+	static async getBirds(lat, lng, radius, hotspot) {
 		const url = '/ebird/birds';
 		const data = {
 			lat,
@@ -65,6 +174,13 @@ class Ebird {
 		return birds.map(Bird.from);
 	}
 
+	/**
+	 * Returns a list of hotspots from the ebird API through our API
+	 * @param {number} lat - Latitude
+	 * @param {number} lng - Longitude
+	 * @param {number} radius - Radius/Distance from lat, lng in KM
+	 * @returns {Promise<Hotspot[]>} A promise to a list of formatted hotspots
+	 */
 	static async getHotspots(lat, lng, radius) {
 		const url = '/ebird/hotspots';
 		const data = {
@@ -77,9 +193,33 @@ class Ebird {
 
 		return hotspots.map(Hotspot.from);
 	}
+
+	/**
+	 * Returns a list of locations from our API. Even though this is labeled in ebird,
+	 * we keep it together to prevent creating another class
+	 * @returns {Promise<Location[]>} A promise to a list of formatted locations
+	 */
+	static async getLocations() {
+		// TODO
+	}
 }
 
+/**
+ * The general map
+ * @property {L.Map} map - Leaflet map instance
+ * @property {L.Marker} position - Current user position marker
+ * @property {L.Marker} selected - Currently selected marker
+ * @property {L.MarkerClusterGroup} birds - Marker cluster representing a list of bird markers
+ * @property {L.MarkerClusterGroup} hotspots - Marker cluster representing a list of hotspot markers
+ * @property {L.MarkerClusterGroup} locations - Marker cluster representing a list of location markers
+ * @property {L.LayerGroup} markers - Group of all markers (includes the birds, hotspots, and locations)
+ */
 class BirdMap {
+	/**
+	 * Creates the map
+	 * @param {Element} elementId - Element for the map
+	 * @param {L.LatLng} currentPosition - Leaflet LatLng object that contains the current position
+	 */
 	constructor(elementId, currentPosition) {
 		const tileLayerSource = 'https://a.tiles.mapbox.com/styles/v1/lohneswright/ciocejooj006obdnjhmd2x9qp/tiles/{z}/{x}/{y}?access_token={accessToken}';
 
@@ -131,6 +271,13 @@ class BirdMap {
 		this.map.fitBounds(bounds);
 	}
 
+	/**
+	 * Generates a list of bird markers using the current position of the user.
+	 * Keeps only birds that fit within the current boundaries.
+	 * Keeps only birds that aren't near hotspots.
+	 * Keeps only new birds that haven't been added yet.
+	 * @returns {Promise<L.Marker[]>} A promise to a list of bird markers
+	 */
 	async getBirds() {
 		const { lat, lng } = this.getCurrPosition();
 		const birds = await Ebird.getBirds(lat, lng, this.getRadius());
@@ -143,6 +290,12 @@ class BirdMap {
 		return markers;
 	}
 
+	/**
+	 * Generates a list of hotspot markers using the current position of the user
+	 * Keeps only hotspots that fit within the current boundaries.
+	 * Keeps only new hotspots that haven't been added yet.
+	 * @returns {Promise<L.Marker[]>} A promise to a list of hotspot markers
+	 */
 	async getHotspots() {
 		const { lat, lng } = this.getCurrPosition();
 		const hotspots = await Ebird.getHotspots(lat, lng, this.getRadius());
@@ -154,11 +307,29 @@ class BirdMap {
 		return markers;
 	}
 
+	/**
+	 * Generates a list of location markers using the current position of the user
+	 * Keeps only new locations that haven't been added yet.
+	 * @returns {Promise<L.Marker[]>} A promise to a list of location markers
+	 */
 	async getLocations() {
-		// TODO: Add locations
+		// TODO
 	}
 
+	/**
+	 * Creates a marker, but DOES NOT add it to the map
+	 * @param {L.LatLng} latLng - Location of the marker
+	 * @param {string} customId - Marker identifier to prevent duplicate markers
+	 * @param {L.Icon} icon - Icon shown on map when the marker is NOT selected
+	 * @param {L.Icon} selectedIcon - Icon shown on map when the marker IS selected
+	 * @returns {L.Marker} Newly generated marker
+	 */
 	createMarker(latLng, customId, icon, selectedIcon) {
+		/**
+		 * @property {L.Icon} defaultIcon - Icon shown on map when the marker is NOT selected
+		 * @property {L.Icon} selectedIcon - Icon shown on map when the marker IS selected
+		 * @property {string} customId - Marker identifier to prevent duplicate markers
+		 */
 		const marker = L.marker(latLng, {
 			icon,
 			riseOnHover: true
@@ -168,6 +339,12 @@ class BirdMap {
 		marker.selectedIcon = selectedIcon;
 		marker.customId = customId;
 
+		/**
+		 * On click:
+		 * 		deselect the old marker
+		 * 		select the current marker
+		 * 		pan to the current marker
+		 */
 		marker.on('click', () => {
 			const position = marker.getLatLng();
 			if (this.selected) this.selected.setIcon(this.selected.defaultIcon);
@@ -179,6 +356,11 @@ class BirdMap {
 		return marker;
 	}
 
+	/**
+	 * Creates a bird marker
+	 * @param {Bird} bird - Formatted bird data
+	 * @returns {L.Marker} Marker representing a bird
+	 */
 	createBird(bird) {
 		const { latLng } = bird.loc;
 
@@ -186,7 +368,7 @@ class BirdMap {
 			html: '<i class="fa-solid fa-dove fa-2x"></i>',
 			iconSize: [20, 20],
 			className: 'bird-icon'
-		})
+		});
 
 		const selectedIcon = L.divIcon({
 			html: '<i class="fa-solid fa-dove fa-2x"></i>',
@@ -196,6 +378,10 @@ class BirdMap {
 
 		const marker = this.createMarker(latLng, bird.subId, icon, selectedIcon);
 
+		/**
+		 * On click:
+		 * 		displays the bird
+		 */
 		marker.on('click', () => {
 			$('.overlay')
 				.html(`
@@ -223,6 +409,11 @@ class BirdMap {
 		return marker;
 	}
 
+	/**
+	 * Creates a hotspot marker
+	 * @param {Hotspot} hotspot - Formatted hotspot data
+	 * @returns {L.Marker} Marker representing a hotspot
+	 */
 	createHotspot(hotspot) {
 		const { latLng } = hotspot.loc;
 
@@ -240,17 +431,31 @@ class BirdMap {
 
 		const marker = this.createMarker(latLng, hotspot.loc.id, icon, selectedIcon);
 
+		/**
+		 * On click:
+		 * 		displays the hotspot
+		 * 		gets a list of birds at the hotspot
+		 * 		displays the birds on a grid with the hotspot data
+		 */
 		marker.on('click', () => {
-			console.log('TODO');
+			// TODO
 		});
 
 		return marker;
 	}
 
+	/**
+	 * Creates a location marker
+	 * @param {Location} hotsplocationot - Formatted location data
+	 * @returns {L.Marker} Marker representing a location
+	 */
 	createLocation(location) {
 		// TODO
 	}
 
+	/**
+	 * Loads the markers for the hotspots, then the birds
+	 */
 	async load() {
 		const hotspots = await this.getHotspots();
 		this.locations.insert(...hotspots);
@@ -259,14 +464,26 @@ class BirdMap {
 		this.birds.insert(...birds);
 	}
 
+	/**
+	 * Offset pans to the marker with the target position
+	 * @param {L.LatLng} latLng - The location of the marker to offset pan to
+	 */
 	setCurrPosition(latLng) {
 		this.map.panToOffset(latLng, [window.innerWidth / 4, 0]);
 	}
 
+	/**
+	 * Gets the center of the map, setCurrPosition and getCurrPosition are NOT the same
+	 * @returns {L.LatLng} The location of the center of the map
+	 */
 	getCurrPosition() {
 		return this.map.getCenter();
 	}
 
+	/**
+	 * Sets the position of the user marker. If no marker exists, create it
+	 * @param {L.LatLng} latLng - Position of the user
+	 */
 	setUserPosition(latLng) {
 		if (!this.position) {
 			const icon = L.divIcon({
@@ -290,10 +507,18 @@ class BirdMap {
 		this.position.setLatLng(latLng);
 	}
 
+	/**
+	 * Get the current user position
+	 * @returns {L.LatLng} Position of the user
+	 */
 	getUserPosition() {
 		return this.position.getLatLng();
 	}
 
+	/**
+	 * Calculates the radius given the current map boundaries. This is critical for loading data.
+	 * @returns {number} Radius in KM
+	 */
 	getRadius() {
 		const bounds = this.map.getBounds();
 		const ne = bounds.getNorthEast();
@@ -306,11 +531,23 @@ class BirdMap {
 	}
 }
 
+/**
+ * Wrapper of geolocation API
+ */
 class GPS {
+	/**
+	 * Creates a new GPS. Prevents us from having too many watchers.
+	 */
 	constructor() {
 		this.watchId = null;
 	}
 
+	/**
+	 * Fetches the current user location
+	 * @param {number} defaultLat - Default latitude
+	 * @param {number} defaultLng - Default longitude
+	 * @returns {Promise<L.LatLng>} A promise to the user's current location
+	 */
 	getCurrentPosition(defaultLat, defaultLng) {
 		const defaultPosition = L.latLng(defaultLat, defaultLng);
 
@@ -338,6 +575,12 @@ class GPS {
 		});
 	}
 
+	/**
+	 * Watches the current user's position and calls `onPosChange` when the user's position changes
+	 * @callback onPosChange
+	 * 		@param {L.LatLng} latLng - Contains the position of the user
+	 * @returns {number} Watch ID
+	 */
 	watchCurrentPosition(onPosChange) {
 		const defaultPosition = L.latLng(defaultLat, defaultLng);
 
@@ -366,6 +609,9 @@ class GPS {
 		return watchId;
 	}
 
+	/**
+	 * Clear the current watch
+	 */
 	clearWatchCurrentPosition() {
 		if (!this.watchId) throw new Error('Not currently watching position');
 
@@ -375,10 +621,18 @@ class GPS {
 	}
 }
 
+// Keep these variables outside, so you can use the console inspection tool to debug
 let mymap = null;
 let gps = null;
 
 window.addEventListener('load', async () => {
+	/**
+	 * Pan to location on map with an offset
+	 * @param {L.LatLng} latlng - Position to pan to
+	 * @param {[xOffset: number, yOffset: number]} offset - Pairing of x and y offsets in PX values
+	 * @param {Object} [options] - OPTIONAL, additional pan options
+	 * @returns {L.Map} Map
+	 */
 	L.Map.prototype.panToOffset = function(latlng, offset, options) {
 		const x = this.latLngToContainerPoint(latlng).x - offset[0];
 		const y = this.latLngToContainerPoint(latlng).y - offset[1];
@@ -387,6 +641,12 @@ window.addEventListener('load', async () => {
 			pan: options
 		});
 	};
+
+	/**
+	 * Inserts layer(s) to a map. Excludes duplicate markers.
+	 * @param {...L.Marker} layers - Each argument is processed as a different layer
+	 * @returns {L.LayerGroup[]} List of the same layer group. This is really not needed, but is good to have
+	 */
 	L.LayerGroup.prototype.insert = function(...layers) {
 		return layers.map(layer => {
 			if (this.getLayers().find(currLayer => currLayer.customId === layer.customId)) return null;
@@ -394,6 +654,9 @@ window.addEventListener('load', async () => {
 		});
 	};
 
+	// Initialize the GPS
 	gps = new GPS();
+
+	// Load the map
 	mymap = new BirdMap('leaflet-map', await gps.getCurrentPosition(37.8039, -122.2591));
 });
