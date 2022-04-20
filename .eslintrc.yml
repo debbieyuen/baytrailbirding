@@ -52,7 +52,7 @@ rules:
     - getBeforeSet
   max-classes-per-file:
     - error
-    - 3
+    - 10
   no-caller: error
   no-constructor-return: error
   no-div-regex: warn
@@ -215,7 +215,8 @@ rules:
   nonblock-statement-body-position: error
   object-curly-newline:
     - error
-    - minProperties: 1
+    - multiline: true
+      consistent: true
   object-curly-spacing:
     - error
     - always

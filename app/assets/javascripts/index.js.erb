@@ -12,55 +12,75 @@ const Unit = {
 	m2mi: m => Unit.km2mi(m / 1000)
 };
 
-class Ebird {
-	static getBirds(lat, lng, radius) {
+class API {
+	static get(url, data) {
 		const request = {
-			url: '/ebird/birds',
 			method: 'GET',
-			data: {
-				lat,
-				lng,
-				radius
-			}
+			url,
+			data
 		};
 
 		return new Promise(resolve => {
-			$.ajax(request).done(birds => {
-				birds.forEach(bird => {
-					bird.obs.date = new Date(bird.obs.date);
-					bird.loc.latLng = L.latLng(bird.loc.lat, bird.loc.lng);
-				});
-				resolve(birds);
-			});
+			$.ajax(request).done(data => resolve(data));
 		});
 	}
+}
 
-	static getHotspots(lat, lng, radius) {
-		const request = {
-			url: '/ebird/hotspots',
-			method: 'GET',
-			data: {
-				lat,
-				lng,
-				radius
-			}
+class Hotspot {
+	constructor(hotspot) {
+		Object.assign(this, JSON.parse(JSON.stringify(hotspot)));
+		this.obs.date = new Date(this.obs.date);
+		this.loc.latLng = L.latLng(this.loc.lat, this.loc.lng);
+	}
+
+	static from(hotspot) {
+		return new Hotspot(hotspot);
+	}
+}
+
+class Bird {
+	constructor(bird) {
+		Object.assign(this, JSON.parse(JSON.stringify(bird)));
+		this.obs.date = new Date(this.obs.date);
+		this.loc.latLng = L.latLng(this.loc.lat, this.loc.lng);
+	}
+
+	static from(bird) {
+		return new Bird(bird);
+	}
+}
+
+class Ebird {
+	static async getBirds(lat, lng, radius, hotspot = undefined) {
+		const url = '/ebird/birds';
+		const data = {
+			lat,
+			lng,
+			radius,
+			hotspot
 		};
 
-		return new Promise(resolve => {
-			$.ajax(request).done(hotspots => {
-				hotspots.forEach(hotspot => {
-					hotspot.obs.date = new Date(hotspot.obs.date);
-					hotspot.loc.latLng = L.latLng(hotspot.loc.lat, hotspot.loc.lng);
-				});
-				resolve(hotspots);
-			});
-		});
+		const birds = await API.get(url, data);
+
+		return birds.map(Bird.from);
+	}
+
+	static async getHotspots(lat, lng, radius) {
+		const url = '/ebird/hotspots';
+		const data = {
+			lat,
+			lng,
+			radius
+		};
+
+		const hotspots = await API.get(url, data);
+
+		return hotspots.map(Hotspot.from);
 	}
 }
 
 class BirdMap {
 	constructor(elementId, currentPosition) {
-
 		const tileLayerSource = 'https://a.tiles.mapbox.com/styles/v1/lohneswright/ciocejooj006obdnjhmd2x9qp/tiles/{z}/{x}/{y}?access_token={accessToken}';
 
 		const map = L.map(elementId).setView([37.42, -121.91], 13);
@@ -73,46 +93,7 @@ class BirdMap {
 
 		this.map = map;
 
-		this.icon = {
-			bird: {
-				selected: L.divIcon({
-					html: '<i class="fa-solid fa-dove fa-2x"></i>',
-					iconSize: [20, 20],
-					className: 'bird-icon-selected'
-				}),
-				marker: L.divIcon({
-					html: '<i class="fa-solid fa-dove fa-2x"></i>',
-					iconSize: [20, 20],
-					className: 'bird-icon'
-				})
-			},
-			hotspot: {
-				selected: L.divIcon({
-					html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
-					iconSize: [20, 20],
-					className: 'hotspot-icon-selected'
-				}),
-				marker: L.divIcon({
-					html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
-					iconSize: [20, 20],
-					className: 'hotspot-icon'
-				})
-			},
-			location: {
-				selected: L.divIcon({
-					html: 'TODO',
-					iconSize: [20, 20],
-					className: 'bird-icon-selected'
-				}),
-				marker: L.divIcon({
-					html: 'TODO',
-					iconSize: [20, 20],
-					className: 'bird-icon'
-				})
-			}
-		}
-
-		this.position = currentPosition;
+		this.setUserPosition(currentPosition);
 
 		this.map.panTo(currentPosition);
 
@@ -142,9 +123,7 @@ class BirdMap {
 				this.load();
 			});
 
-			this.map.addLayer(this.birds);
-			this.map.addLayer(this.hotspots);
-			this.map.addLayer(this.locations);
+			this.map.addLayer(this.markers);
 
 			this.load();
 		});
@@ -152,74 +131,70 @@ class BirdMap {
 		this.map.fitBounds(bounds);
 	}
 
-	async loadBirds() {
-		const {
-			lat, lng
-		} = this.getCurrPosition();
+	async getBirds() {
+		const { lat, lng } = this.getCurrPosition();
 		const birds = await Ebird.getBirds(lat, lng, this.getRadius());
 		const bounds = this.map.getBounds();
 		const markers = birds
 			.filter(bird => bounds.contains(bird.loc.latLng))
-			.map(bird => this.createBird(bird.loc.latLng, bird));
+			.map(bird => this.createBird(bird))
+			.filter(birdMarker => !this.hotspots.getLayers().find(hotspotMarker => hotspotMarker.getLatLng().equals(birdMarker.getLatLng())));
 
-		markers.forEach(marker => {
-			const isNearHotspot = this.hotspots.getLayers().find(hotspotMarker => hotspotMarker.getLatLng().equals(marker.getLatLng()));
-			const alreadyExists = this.birds.getLayers().find(mapMarker => mapMarker.birdId === marker.birdId);
-			if (!alreadyExists && !isNearHotspot) this.birds.addLayer(marker);
-		});
+		return markers;
 	}
 
-	async loadHotspots() {
-		const {
-			lat, lng
-		} = this.getCurrPosition();
+	async getHotspots() {
+		const { lat, lng } = this.getCurrPosition();
 		const hotspots = await Ebird.getHotspots(lat, lng, this.getRadius());
 		const bounds = this.map.getBounds();
 		const markers = hotspots
 			.filter(hotspot => bounds.contains(hotspot.loc.latLng))
-			.map(hotspot => this.createHotspot(hotspot.loc.latLng, hotspot));
+			.map(hotspot => this.createHotspot(hotspot));
 
-		markers.forEach(marker => {
-			const alreadyExists = this.hotspots.getLayers().find(mapMarker => mapMarker.locId === marker.locId);
-			if (!alreadyExists) this.hotspots.addLayer(marker);
-		});
+		return markers;
 	}
 
-	async loadLocations() {
-		// Right now does not load anything
+	async getLocations() {
+		// TODO: Add locations
 	}
 
-	async load() {
-		await this.loadHotspots();
-
-		await this.loadLocations();
-
-		await this.loadBirds();
-	}
-
-	createMarker(latLng, icon, selectIcon) {
+	createMarker(latLng, customId, icon, selectedIcon) {
 		const marker = L.marker(latLng, {
 			icon,
 			riseOnHover: true
 		});
 
 		marker.defaultIcon = icon;
+		marker.selectedIcon = selectedIcon;
+		marker.customId = customId;
 
 		marker.on('click', () => {
 			const position = marker.getLatLng();
-			if (this.selected) this.selected.setIcon(icon);
+			if (this.selected) this.selected.setIcon(this.selected.defaultIcon);
 			this.selected = marker;
-			this.selected.setIcon(selectIcon);
+			this.selected.setIcon(selectedIcon);
 			this.setCurrPosition(position);
 		});
 
 		return marker;
 	}
 
-	createBird(latLng, bird) {
-		const marker = this.createMarker(latLng, this.icon.bird.marker, this.icon.bird.selected);
+	createBird(bird) {
+		const { latLng } = bird.loc;
 
-		marker.birdId = bird.subId;
+		const icon = L.divIcon({
+			html: '<i class="fa-solid fa-dove fa-2x"></i>',
+			iconSize: [20, 20],
+			className: 'bird-icon'
+		})
+
+		const selectedIcon = L.divIcon({
+			html: '<i class="fa-solid fa-dove fa-2x"></i>',
+			iconSize: [20, 20],
+			className: 'bird-icon-selected'
+		});
+
+		const marker = this.createMarker(latLng, bird.subId, icon, selectedIcon);
 
 		marker.on('click', () => {
 			$('.overlay')
@@ -234,7 +209,7 @@ class BirdMap {
 						<div class="location-wrapper">
 							<div class="location">Loc</div>
 							<div class="separator"><i class="fa-solid fa-circle"></i></div>
-							<div class="distance">${Unit.m2mi(marker.getLatLng().distanceTo(this.position)).toFixed(2)} mi</div>
+							<div class="distance">${Unit.m2mi(marker.getLatLng().distanceTo(this.getUserPosition())).toFixed(2)} mi</div>
 						</div>
 						<div class="description-wrapper">
 							<div class="description-header">Description:</div>
@@ -248,20 +223,40 @@ class BirdMap {
 		return marker;
 	}
 
-	createHotspot(latLng, hotspot) {
-		const marker = this.createMarker(latLng, this.icon.hotspot.marker, this.icon.hotspot.selected);
+	createHotspot(hotspot) {
+		const { latLng } = hotspot.loc;
 
-		marker.locId = hotspot.loc.id;
+		const icon = L.divIcon({
+			html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
+			iconSize: [20, 20],
+			className: 'hotspot-icon'
+		});
+
+		const selectedIcon = L.divIcon({
+			html: '<i class="fa-solid fa-binoculars fa-2x"></i>',
+			iconSize: [20, 20],
+			className: 'hotspot-icon-selected'
+		});
+
+		const marker = this.createMarker(latLng, hotspot.loc.id, icon, selectedIcon);
 
 		marker.on('click', () => {
-			console.log(hotspot);
+			console.log('TODO');
 		});
 
 		return marker;
 	}
 
-	createLocation(latLng, location) {
+	createLocation(location) {
 		// TODO
+	}
+
+	async load() {
+		const hotspots = await this.getHotspots();
+		this.locations.insert(...hotspots);
+
+		const birds = await this.getBirds();
+		this.birds.insert(...birds);
 	}
 
 	setCurrPosition(latLng) {
@@ -270,6 +265,33 @@ class BirdMap {
 
 	getCurrPosition() {
 		return this.map.getCenter();
+	}
+
+	setUserPosition(latLng) {
+		if (!this.position) {
+			const icon = L.divIcon({
+				html: '<i class="fa-solid fa-street-view fa-3x"></i>',
+				iconSize: [20, 20],
+				className: 'user-icon'
+			});
+
+			const marker = L.marker(latLng, {
+				icon,
+				riseOnHover: true
+			});
+			this.position = marker;
+
+			console.log(this.position);
+
+			this.map.addLayer(this.position);
+
+			console.log('Nice');
+		}
+		this.position.setLatLng(latLng);
+	}
+
+	getUserPosition() {
+		return this.position.getLatLng();
 	}
 
 	getRadius() {
@@ -363,6 +385,12 @@ window.addEventListener('load', async () => {
 		const point = this.containerPointToLatLng([x, y]);
 		return this.setView(point, this.getZoom(), {
 			pan: options
+		});
+	};
+	L.LayerGroup.prototype.insert = function(...layers) {
+		return layers.map(layer => {
+			if (this.getLayers().find(currLayer => currLayer.customId === layer.customId)) return null;
+			return this.addLayer(layer);
 		});
 	};
 
