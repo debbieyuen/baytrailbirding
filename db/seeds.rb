@@ -102,7 +102,7 @@ locations = Location.create([{name: "Heron's Head Park",
  							short_desc: "Several hotspots at the southern end of the bay include parts of Don Edwards San Francisco Bay National
  							Wildlife Refuge, Alviso Marina County Park, and nearby grasslands.",
  							websiteURL: "https://www.sccgov.org/sites/parks/parkfinder/Pages/AlvisoMarina.aspx",
- 							picURL: "https://www.sccgov.org/sites/parks/parkfinder/PublishingImages/AlvisoBoardwalk.jpg",
+ 							picURL: "http://sfbaywatertrail.org/wp-content/uploads/2022/04/Alviso_Botkin_040815-21-1920x0-cropped.jpg",
  							latitude: "37.430259", longitude: "-121.979093"},
 
  							{name: "Ravenswood Salt Pond SF2",
@@ -170,9 +170,8 @@ locations = Location.create([{name: "Heron's Head Park",
  							latitude: "38.2655389", longitude: "-122.2827163"},
 
 							{name: "Shollenberger Park",
- 							description: "Shollenberger Park is an example of how wetlands benefit both wildlife and the citizens that live nearby. The park is a complex series of sea-
-							 sonal wetlands that provide high quality habitat for wildlife while serving as flood protection to nearby neighborhoods. Willows and elderberries
-							 in the uplands of the park attract many birds throughout the year, and the mudflats in the wetlands are always busy with various waterbirds, especially in spring and fall
+ 							description: "Shollenberger Park is an example of how wetlands benefit both wildlife and the citizens that live nearby. The park is a complex series of seasonal wetlands that provide high quality habitat for wildlife while serving as flood protection to nearby neighborhoods. 
+							 Willows and elderberries in the uplands of the park attract many birds throughout the year, and the mudflats in the wetlands are always busy with various waterbirds, especially in spring and fall
 							 when the lower water level is favorable to shorebirds. Look for Common Gallinules hugging the shoreline of the wetlands and an occasional Pacific Golden-Plover on the mudflat in fall.",
 							 short_desc: "Shollenberger Park is a complex series of seasonal wetlands that provide high quality habitat for wildlife while serving as flood protection to nearby neighborhoods. ",
  							websiteURL: "https://www.sonomacounty.com/outdoor-activities/shollenberger-park",
@@ -196,11 +195,7 @@ locations = Location.create([{name: "Heron's Head Park",
 							emanating from the wetland vegetation during the summer. The
 							ponds further from the parking area are kept mostly denuded but
 							they are still productive for waterfowl; look for Common Merganser and Common Goldeneye on these ponds. Tree and Cliff
-							Swallows can be especially abundant at the ponds and surrounding open space in spring and summer. Directions: when ap-
-							proaching the entrance to John McInnis Park in San Rafael, cross
-							the railroad tracks and turn left before the entrance, continuing
-							on Smith Ranch Road to its end at the Las Gallinas Wildlife Area
-							parking lot.",
+							Swallows can be especially abundant at the ponds and surrounding open space in spring and summer.",
 							short_desc:"Las Gallinas Sanitary District Wildlife Area has a rich
 							diversity of ducks, herons and egrets, shorebirds, swallows, and
 							other wetland denizens.",
@@ -212,8 +207,7 @@ locations = Location.create([{name: "Heron's Head Park",
 
 							{name: "China Camp State Park",
 							description:"China Camp State Park is a convenient, scenic getaway from the
-							Bay Area metropolis. Salt marsh abuts hills covered in oak wood-
-							land creating an interesting juxtaposition of habitats
+							Bay Area metropolis. Salt marsh abuts hills covered in oak woodland creating an interesting juxtaposition of habitats
 							found nowhere else in the
 							bay. North San Pedro Road
 							winds along the perimeter of
@@ -224,9 +218,7 @@ locations = Location.create([{name: "Heron's Head Park",
 							seen hunting for prey hiding
 							in the marsh. The many trails
 							leading into the hills above the marsh provide opportunities to
-							see various landbirds such as Spotted Towhees and Wrentits.
-							Directions: park at China Camp Village or other locations along
-							North San Pedro Road in San Rafael.",
+							see various landbirds such as Spotted Towhees and Wrentits.",
 							short_desc:"China Camp State Park is a convenient, scenic getaway from the
 							Bay Area metropolis.",
 						 	websiteURL:"http://www.parks.ca.gov/?page_id=466",
@@ -247,9 +239,7 @@ locations = Location.create([{name: "Heron's Head Park",
 							that are worth exploring. Some of the
 							trails are small rises above the marsh
 							allowing a unique, close-up view
-							of this habitat. Directions: take the
-							Industrial Avenue exit off Highway 101 and continue one block to
-							the parking area at the end.",
+							of this habitat.",
 							short_desc:"As with many places in bay, there is an abrupt transition from the
 							urban sprawl to the marshes of Corte Madera Marsh Ecological
 							Reserve.",
@@ -272,8 +262,7 @@ locations = Location.create([{name: "Heron's Head Park",
 							Point, which is a nice place
 							to spend an afternoon watching for raptors catching thermals
 							overhead. The klaxon alarm of a Ring-necked Pheasant may be
-							heard from the patches of sedges nearby. Directions: the park is
-							located at 1 State Park Road in Benicia.",
+							heard from the patches of sedges nearby.",
 							short_desc:"Tucked into a small bay on the Carquinez Strait, this park has
 							impressive views of the strait and the grassy foothills rising
 							above it.",
@@ -293,7 +282,7 @@ locations = Location.create([{name: "Heron's Head Park",
 							short_desc:"Hudeman Slough is one of many waterways through the expansive landscape of grain fields, vineyards, and wetlands in
 							this area.",
 						 	websiteURL:"https://www.sonomahikingtrails.com/parks/hudeman-slough-wetlands/",
-							picURL:"https://parks.sonomacounty.ca.gov/uploadedImages/Parks/-_Content_New/_Uploaded_Images/_Carousel/_Parks/_Hudeman_Slough_Boat_Launch/hudeman-slough-750.JPG?n=8471",
+							picURL:"https://photos.alltrails.com/eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMzI5OTQ5OTQvNmFhOWM3NjZiM2M1YzMxMjFjNzAxZDMzMmNkYjgyYWEuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGVnIiwicmVzaXplIjp7IndpZHRoIjo1MDAsImhlaWdodCI6NTAwLCJmaXQiOiJpbnNpZGUifSwicm90YXRlIjpudWxsLCJqcGVnIjp7InRyZWxsaXNRdWFudGlzYXRpb24iOnRydWUsIm92ZXJzaG9vdERlcmluZ2luZyI6dHJ1ZSwib3B0aW1pc2VTY2FucyI6dHJ1ZSwicXVhbnRpc2F0aW9uVGFibGUiOjN9fX0=",
 							latitude:"38.20574612502795",
 						 	longitude: "-122.37440231578378",
 							}

@@ -1,29 +1,151 @@
-html, body {
-	padding: 0;
-	margin: 0;
+html,
+body {
+    padding: 0;
+    margin: 0;
 }
 
 .navigation {
-	height: 100px;
-	line-height: 100px;
-	font-weight: 600;
-	color: #333;
-	height: parent;
-	padding-left: 100px;
+    height: 100px;
+    line-height: 100px;
+    font-weight: 600;
+    color: #333;
+    height: parent;
+    padding-left: 100px;
 }
 
 #location-name {
-	font-family: "Playfair";
-	font-weight: 600;
+    font-family: "Playfair";
+    font-weight: 600;
 }
 
 #location-card {
-	max-height: 150px;
-	overflow: hidden;
-	transition: max-height 0.75s ease-in-out;
+    max-height: 150px;
+    overflow: hidden;
+    transition: max-height 0.75s ease-in-out;
 }
 
-#location-card:hover{
-	max-height: 500px;
-	transition: max-height 0.75s ease-in-out;
+#location-card:hover {
+    max-height: 500px;
+    transition: max-height 0.75s ease-in-out;
+}
+
+.sidenav {
+    height: 80%;
+    /* Full-height: remove this if you want "auto" height */
+    width: 240px;
+    /* Set the width of the sidebar */
+    position: absolute;
+    /* Fixed Sidebar (stay in place on scroll) */
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.link_colored {
+    color: white;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    padding: 10px;
+}
+.grid-item {
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+}
+.scrolling-wrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.scrolling-wrapper .card {
+    display: inline-block;
+}
+
+@media(max-width:768px) {
+    #logo img {
+        width: 0px;
+        height: 0px
+    }
+}
+
+.footer-basic {
+    padding: 40px 0;
+    background-color: #ffffff;
+    color: #4b4c4d;
+}
+
+.footer-basic ul {
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.footer-basic li {
+    padding: 0 10px;
+}
+
+.footer-basic ul a {
+    color: #166dc4;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.footer-basic ul a:hover {
+    opacity: 1;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Float four columns side by side */
+.column {
+    float: left;
+    width: 25%;
+    padding: 0 10px;
+}
+
+/* Remove extra left and right margins, due to padding in columns */
+.row {
+    margin: 0 -5px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Style the counter cards */
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    /* this adds the "card" effect */
+    padding: 16px;
+    text-align: center;
+    background-color: #f1f1f1;
+}
+
+/* Responsive columns - one column layout (vertical) on small screens */
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+        display: block;
+        margin-bottom: 20px;
+    }
+}
+
+ul.no-bullets {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }

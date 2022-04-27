@@ -1,11 +1,11 @@
 <%= render "header" %>
 <br>
-<div class = "donation-link">
-  <h1 class = "padding-top:5px text-center">
+<div class="text-center">
+  <h1 style="padding-top:5px">
     Donate to the Bay Trail Project
   </h1>
   <br>
-  <h2 class = "text-center">
+  <h2>
     Donate
   </h2>
   <p>
@@ -14,18 +14,14 @@
   <h4>
     <a href="https://mtc.ca.gov/sites/default/files/documents/2022-01/Bay-Trail-Donation-Form%20Updated.pdf" target="_blank"> San Francisco Bay Trail Donation Form </a>
   </h4>
-  <%= image_tag("bay_trail_donation.jpg", :class => "w-25 h-25") %>
+    <%= image_tag("bay_trail_donation.jpg", class: "w-50 h-50", alt: "Image of Bay Trail") %>
 </div>
-<div class = "donation-info">
+<div>
   <h2 class="text-center">
   About Your Donation
   </h2>
     <p>
-      The Bay Trail Project is a 501(c)(3) non-profit. Your contribution will support outreach and education, and contribute to the creation of a spectacular shoreline resource to be enjoyed for generations.
-
-      Make a donation via check or money order. We are unable to accept credit card donations at this time.
-
-      All contributions are fully tax-deductible and go directly to assist outreach efforts of the Bay Trail Project, a 501(c)(3) non-profit corporation. A donation receipt will be provided for tax purposes.
+      The Bay Trail Project is a 501(c)(3) non-profit. Your contribution will support outreach and education, and contribute to the creation of a spectacular shoreline resource to be enjoyed for generations. Make a donation via check or money order. We are unable to accept credit card donations at this time. All contributions are fully tax-deductible and go directly to assist outreach efforts of the Bay Trail Project, a 501(c)(3) non-profit corporation. A donation receipt will be provided for tax purposes.
     </p>
 </div>
 <%= render "footer" %>

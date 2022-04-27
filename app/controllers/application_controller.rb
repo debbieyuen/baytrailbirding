@@ -5,15 +5,9 @@ class ApplicationController < ActionController::Base
     @locations_full = Location.all.sort_by{|location| hav_distance([location.latitude.to_f, location.longitude.to_f], @current_location)}
   end
 
-  def tips
-  end
-
   def show
     calc_location()
-  	@locations_full = Location.all
-  end
-
-  def donation
+  	@locations_full = Location.all.sort_by{|location| hav_distance([location.latitude.to_f, location.longitude.to_f], @current_location)}
   end
 
   def calc_location

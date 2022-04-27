@@ -1,27 +1,21 @@
 <%= render "header" %>
-<br>
 <center>
   <h2 style="padding-top:5px;">
     <font size=20> ALL LOCATIONS </font>
   </h2>
 </center>
-  <div class="row">
-    <div class="card-columns">
-      <% @locations_full.each do |location| %>
-        <div class="card">
-          <img class="card-img-top" src="<%= location.picURL %>" />
-          <div class="card-body">
-            <h5 id="location-name"><%= location.name %></h5>
-            <h5><%= number_with_precision(hav_distance([location.latitude.to_f, location.longitude.to_f], @current_location), precision: 2) %> mi</h5>
-            <p class="card-text" style="font-size: 14px;"><%= location.description %></p>
-          </div>
-          <div class="card-footer">
-            <a href="<%= location.websiteURL %>" class="card-link" target="_blank">Website</a>
-          </div>
+<div class="row">
+  <% @locations_full.each do |location| %>
+    <div class = "column">
+      <div class="card" >
+        <img class="card-img-top" src="<%= location.picURL %>" />
+        <div class="card-body">
+          <h5 id="location-name"><%=link_to location.name, location.websiteURL, target: "_blank" %></h5>
+          <h5><%= number_with_precision(hav_distance([location.latitude.to_f, location.longitude.to_f], @current_location), precision: 2) %> mi</h5>
+          <p class="card-text" style="font-size: 14px;"><%= location.description %></p>
         </div>
-        <br>
-      <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 </div>
 <%= render "footer" %>
