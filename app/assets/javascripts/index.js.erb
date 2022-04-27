@@ -659,4 +659,8 @@ window.addEventListener('load', async () => {
 
 	// Load the map
 	mymap = new BirdMap('leaflet-map', await gps.getCurrentPosition(37.8039, -122.2591));
+
+	$('#navigation').click(() => {
+		document.querySelector('nav').toggleAttribute('hidden');
+	});
 });

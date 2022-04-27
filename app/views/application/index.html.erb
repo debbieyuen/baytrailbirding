@@ -5,7 +5,14 @@
   </div>
   <div class="nav">
     <div class="nav-btn"><i class="fa-solid fa-magnifying-glass"></i></div>
-    <div class="nav-btn"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    <div class="nav-btn" id="navigation">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+      <nav>
+        <%= link_to "Donate", "/donation" %>
+        <%= link_to "Locations", "/locations" %>
+        <%= link_to "Tips", "/tips" %>
+      </nav>
+    </div>
     <div class="nav-btn info"><i class="fa-solid fa-info"></i></div>
   </div>
 </div>
