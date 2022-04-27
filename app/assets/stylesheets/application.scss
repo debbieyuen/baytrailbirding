@@ -15,21 +15,21 @@
 */
 
 main {
-  overflow: hidden;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 #leaflet-map {
-  width: 100vmax;
-  height: 100vmax;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+	width: 100vmax;
+	height: 100vmax;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400&display=swap');
@@ -52,29 +52,35 @@ $gold: #FFCD1A;
 	align-items: center;
 	justify-content: space-between;
 	margin: 10px;
-  z-index: 1;
-  pointer-events: none;
-  div {
-    pointer-events: auto;
-  }
+	z-index: 1;
+	pointer-events: none;
+
+	div {
+		pointer-events: auto;
+	}
+
 	.title {
 		background-color: $white;
 		border-radius: 999px;
 		padding: 0 20px;
-		padding:  10px;
+		padding: 10px;
 		display: flex;
 		margin: 5px;
 		align-items: center;
+
 		.logo {
 			height: 20px;
 		}
+
 		.name {
 			font-size: 14px;
 		}
 	}
+
 	.nav {
 		display: flex;
 		position: relative;
+
 		.nav-btn {
 			width: 30px;
 			height: 30px;
@@ -84,8 +90,9 @@ $gold: #FFCD1A;
 			align-items: center;
 			justify-content: center;
 			margin: 0 2.5px;
-      cursor: pointer;
+			cursor: pointer;
 		}
+
 		.info {
 			box-sizing: border-box;
 			background-color: $gold;
@@ -97,21 +104,23 @@ $gold: #FFCD1A;
 
 .overlay {
 	display: flex;
-	position: absolute; 
+	position: absolute;
 	background-color: $white;
 	// bottom: -30vh; // FIX
-  left: 10px;
+	left: 10px;
 	// width: 100%;
-  width: 50vw;
+	width: 50vw;
 	flex-direction: column;
 	align-items: center;
 	// border-top-left-radius: 40px;
 	// border-top-right-radius: 40px;
-  border-radius: 10px;
-  box-shadow: 5px 5px 40px rgba($black, 0.3);
-  &[hidden] {
-    display: none;
-  }
+	border-radius: 10px;
+	box-shadow: 5px 5px 40px rgba($black, 0.3);
+
+	&[hidden] {
+		display: none;
+	}
+
 	.expand-icon {
 		margin-top: 10px;
 		width: 38px;
@@ -119,48 +128,56 @@ $gold: #FFCD1A;
 		border-radius: 10px;
 		background-color: #E5E5E5;
 	}
+
 	.content {
 		padding: 30px;
+
 		.bird-name {
 			font-size: 25px;
 			font-weight: bold;
 		}
+
 		.science-name {
 			font-size: 18px;
 			font-weight: 550;
 			color: $darkblue;
 		}
+
 		.bird-img-wrapper {
 			margin-top: 10px;
 			margin-bottom: 10px;
-			.bird-img{
 
-			}
+			.bird-img {}
 		}
+
 		.location-wrapper {
 			display: flex;
 			align-items: center;
-			.location {
 
-			}
+			.location {}
+
 			.separator {
 				font-size: 8px;
 				margin: 0 5px;
 				color: $darkblue
 			}
+
 			.distance {
 				color: $black;
 			}
 		}
+
 		.description-wrapper {
 			display: flex;
 			position: relative;
 			flex-direction: column;
 			margin-top: 15px;
+
 			.description-header {
 				font-size: 16px;
 				font-weight: bold;
 			}
+
 			.description-content {
 				margin-top: 7px;
 				font-size: 16px;
@@ -173,10 +190,10 @@ $gold: #FFCD1A;
 }
 
 .bird-icon {
-  text-align: center;
-  line-height: 20px;
-  color: #3498DB;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-align: center;
+	line-height: 20px;
+	color: #3498DB;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 .bird-icon-selected {
@@ -184,21 +201,21 @@ $gold: #FFCD1A;
 	line-height: 20px;
 	color: #db3434;
 	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  }
+}
 
-  .hotspot-icon {
+.hotspot-icon {
 	text-align: center;
 	line-height: 20px;
 	color: #00b300;
 	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  }
-  
-  .hotspot-icon-selected {
-	  text-align: center;
-	  line-height: 20px;
-	  color: #db3434;
-	  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-	}
+}
+
+.hotspot-icon-selected {
+	text-align: center;
+	line-height: 20px;
+	color: #db3434;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
 
 .user-icon {
 	text-align: center;
