@@ -49,8 +49,6 @@ class Location {
   constructor(location) {
     Object.assign(this, JSON.parse(JSON.stringify(location)));
     this.latLng = L.latLng(this.latitude, this.longitude);
-
-    // TODO: See comments above
   }
 
   /**
@@ -477,7 +475,7 @@ class BirdMap {
 
     /**
 		 * On click:
-		 * 		displays the bird
+		 *   displays the bird
 		 */
     marker.on('click', () => {
       $('.overlay')
