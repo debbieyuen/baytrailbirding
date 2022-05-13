@@ -49,6 +49,7 @@ class Location {
 	constructor(location) {
 		Object.assign(this, JSON.parse(JSON.stringify(location)));
 		this.latLng = L.latLng(this.latitude, this.longitude);
+		
 		// TODO
 	}
 
