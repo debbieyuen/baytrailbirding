@@ -2,8 +2,8 @@
   "name": "baytrailbirding",
   "private": true,
   "scripts": {
-    "lint": "eslint app/assets/javascripts/*",
-    "lint:fix": "eslint app/assets/javascripts/* --fix"
+    "lint": "eslint app/assets* app/javascript",
+    "lint:fix": "eslint app/assets --fix"
   },
   "dependencies": {
     "@rails/actioncable": "^6.0.0",

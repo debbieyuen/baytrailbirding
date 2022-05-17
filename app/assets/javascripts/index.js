@@ -1,7 +1,6 @@
 // ESLINT:
 /* global L, moment, $ */
 
-'use strict';
 
 const MAX_RADIUS = 50;	// Radius distance in KM
 
