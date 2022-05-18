@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   get '/ebird/birds', to: 'ebird#birds'
   get '/ebird/bird', to: 'ebird#bird'
   get '/ebird/hotspots', to: 'ebird#hotspots'
+  get '/ebird/locations', to: 'ebird#locations'
   get '/donation', to: 'application#donation'
 end

@@ -32,4 +32,12 @@ class EbirdController < ApplicationController
     hotspots = get_hotspot_data(lat, lng, radius)
     render json: hotspots
   end
+
+  def locations
+    calc_location
+    locations_full = Location.all.sort_by do |location|
+      hav_distance([location.latitude.to_f, location.longitude.to_f], @current_location)
+    end
+    render json: locations_full
+  end
 end

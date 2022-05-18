@@ -47,8 +47,7 @@ class Location {
 	 */
   constructor(location) {
     Object.assign(this, JSON.parse(JSON.stringify(location)));
-
-    // TODO: See comments above
+    this.latLng = L.latLng(this.latitude, this.longitude);
   }
 
   /**
@@ -198,8 +197,13 @@ class Ebird {
 	 * we keep it together to prevent creating another class
 	 * @returns {Promise<Location[]>} A promise to a list of formatted locations
 	 */
-  static async getLocations() {
-    // TODO: See method comment above
+  static async getLocations(lat, lng) {
+    const url = '/ebird/locations';
+    const data = {};
+
+
+    const locations = await API.get(url, data);
+    return locations.map(Location.from);
   }
 }
 
@@ -247,7 +251,7 @@ class BirdMap {
 
       this.birds = L.markerClusterGroup();
       this.hotspots = L.markerClusterGroup();
-      this.locations = L.markerClusterGroup();
+      this.locations = L.layerGroup();
 
       this.markers = L.layerGroup([this.birds, this.hotspots, this.locations]);
 
@@ -312,7 +316,12 @@ class BirdMap {
 	 * @returns {Promise<L.Marker[]>} A promise to a list of location markers
 	 */
   async getLocations() {
-    // TODO: See method comment above
+    const { lat, lng } = this.getCurrPosition();
+    const locations = await Ebird.getLocations(lat, lng);
+    const markers = locations
+      .map(location => this.createLocation(location));
+
+    return markers;
   }
 
   /**
@@ -449,7 +458,48 @@ class BirdMap {
 	 * @returns {L.Marker} Marker representing a location
 	 */
   createLocation(location) {
-    // TODO: See method comment above
+    const { latLng } = location;
+    const icon = L.divIcon({
+      html: '<i class="fa-solid fa-location-dot fa-2x"></i>',
+      iconSize: [80, 80],
+      className: 'location-icon'
+    });
+
+    const selectedIcon = L.divIcon({
+      html: '<i class="fa-solid fa-location-dot fa-2x"></i>',
+      iconSize: [80, 80],
+      className: 'location-icon-selected'
+    });
+    const marker = this.createMarker(latLng, location.id, icon, selectedIcon);
+
+    /**
+		 * On click:
+		 *   displays the bird
+		 */
+    marker.on('click', () => {
+      $('.overlay')
+        .html(`
+					<div class="expand-icon"></div>
+					<div class="content">
+						<div class="bird-name">${location.name}</div>
+						<div class="bird-img-wrapper">
+							<img class="bird-img" src="${location.picURL}" width=50% height=50%>
+						</div>
+						<div class="location-wrapper">
+							<div class="location">Loc</div>
+							<div class="separator"><i class="fa-solid fa-circle"></i></div>
+							<div class="distance">${Unit.m2mi(marker.getLatLng().distanceTo(this.getUserPosition())).toFixed(2)} mi</div>
+						</div>
+						<div class="description-wrapper">
+							<div class="description-header">Description:</div>
+							<div class="description-content">${location.description}</div>
+					</div>
+					</div>
+				`)
+        .removeAttr('hidden');
+    });
+
+    return marker;
   }
 
   /**
@@ -457,10 +507,13 @@ class BirdMap {
 	 */
   async load() {
     const hotspots = await this.getHotspots();
-    this.locations.insert(...hotspots);
+    this.hotspots.insert(...hotspots);
 
     const birds = await this.getBirds();
     this.birds.insert(...birds);
+
+    const locations = await this.getLocations();
+    this.locations.insert(...locations);
   }
 
   /**
@@ -496,7 +549,6 @@ class BirdMap {
         riseOnHover: true
       });
       this.position = marker;
-
       this.map.addLayer(this.position);
     }
     this.position.setLatLng(latLng);

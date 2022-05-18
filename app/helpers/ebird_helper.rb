@@ -6,12 +6,22 @@ require 'json'
 # Helper for communicating with the Ebird REST API
 module EbirdHelper
   include ActionView::Helpers::NumberHelper
+
+  def calc_location
+    @current_location = [37.8039, -122.2591]
+
+    return unless IPAddress.valid?(request.remote_ip) && (request.remote_ip != '127.0.0.1')
+
+    user_ip = request.remote_ip
+    results = Geocoder.search(user_ip)
+    @current_location = results.first.coordinates if results.first.coordinates&.any?
+  end
+
   def get_bird_data(lat, lng, radius)
     ebird_params = {  lat: number_with_precision(lat, precision: 2),
                       lng: number_with_precision(lng, precision: 2),
                       back: 10,
                       dist: radius }
-
     url = 'https://api.ebird.org/v2/data/obs/geo/recent/'
 
     resp = Faraday.get(url) do |req|
