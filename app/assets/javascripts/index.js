@@ -389,7 +389,7 @@ class BirdMap {
 						<div class="bird-name">${bird.name.com}</div>
 						<div class="science-name">${bird.name.sci}</div>
 						<div class="bird-img-wrapper">
-							<img class="bird-img" src="/duck.png">
+							<img class="bird-img" src=${bird.img.img} width=50% height=50%>
 						</div>
 						<div class="location-wrapper">
 							<div class="location">Loc</div>
